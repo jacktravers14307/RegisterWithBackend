@@ -1,0 +1,89 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+    background-color: #2c3e50;
+}
+
+.innerContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.actualForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 25px;
+    width: 250px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 5px black;
+}
+
+.header h2{
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.inputFields{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.inputFields input{
+    /* border-radius: 5px; */
+    width: 170px;
+    padding: 5px;
+    border: none;
+    border-bottom: 1.4px rgb(65, 79, 92) solid;
+    font-weight: bold;
+}
+
+.inputFields input:focus{
+    outline: none;
+}
+
+.inputFields input:focus::placeholder{
+    color: transparent;
+}
+
+
+.submitButton{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    gap: 5px;
+}
+
+.submitButton button{
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+    border: none;
+    background-color: slategray;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submitButton button:hover{
+    background-color: rgb(103, 118, 132);
+}
+
+.submitButton p{
+    font-size:1rem;
+}
+
+.submitButton a{
+    text-decoration: none;
+    color: rgb(131, 148, 165);
+}
