@@ -1,48 +1,89 @@
 const express = require("express");
-const bcypt = require("bcrypt");
-const path = require("path")
-const mongoose = require("mongoose")
+const bcrypt = require("bcrypt");
+const path = require("path");
+const mongoose = require("mongoose");
+const cors = require("cors")
 
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const PORT = 3000
-
-const app = express()
-
-
-mongoose.connect("mongodb://localhost:27017/crud")
-
+// middleware to parse JSON
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")))
+app.use(cors())
 
 
 
-const userSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    email: String
+// connect to MongoDB
+mongoose.connect("mongodb://localhost:27017/test", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
-const User = mongoose.model("User", userSchema)
+app.get("/signup", (req, res) => {
+    res.sendFile(__dirname + "/public/signup.html");
+});
 
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "signup.html"))
+// Defining the mongoose schema for the user. The schema will represent the structure of the user data in the database
+// all feilds are required and have to be unique except for password, that doesnt have to be unique
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true},
+    password: { type: String, required: true },
 })
 
+// Creating model named "User" from the userSchema, this model is what will be use to interact with the users collection in the database
+const User = mongoose.model("User", userSchema)
 
-app.post("/addUser", async (req, res) => {
+// define route for user registration
+app.post("/register", async (req, res) => {
+    const { username, email, password } = req.body // Extracting the username, email and password from the request body
+
     try{
-        const { username, password, email } = req.body;
-        const hashedPassword = await bcypt.hash(password,10)
-        const newUser = new User({username, password: hashedPassword, email});
+        // hash the password
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        // create a new user object
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        // Save the new user to the database
         await newUser.save()
-        res.status(201).send("User Added Successfully")
+
+        // Send a successful response
+        res.status(201).json({ message: "User Registered" })
     }catch(error){
-        res.status(500).send("Error adding user")
+        // send an error response
+        res.status(400).json({ error: error.message})
+    }
+
+});
+
+// route for logging in
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    try{
+        const user = await User.findOne({ username });
+        if(!user){
+            return res.status(400).json({ error: "Invalid email or password"})
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
+            return res.status(400).json({ error: "Invalid email or password"})
+        }
+
+        res.status(200).json({ message: "Login successful" });
+    }catch(error){
+        res.status(500).json({ error: error.message })
     }
 })
 
 
+
+
 app.listen(PORT, () => {
-    console.log(`Listening on port: ${PORT}`)
+    console.log(`Server is running on port ${PORT}`)
 })
